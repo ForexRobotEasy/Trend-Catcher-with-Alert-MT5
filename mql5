@@ -1,0 +1,59 @@
+
+// Developer: Forex Robot Easy Team
+// Developer's Site: forexroboteasy.com
+// Program Name: Trend Catcher with Alert MT5
+
+#property strict
+
+input int period = 14; // Period for calculating the Trend Catcher Strategy Line
+input double multiplier = 2.0; // Multiplier for adjusting the Trend Catcher Strategy Line sensitivity
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Add indicator buffers
+    SetIndexBuffer(0, TrendCatcherStrategyLineBuffer());
+
+    // Set indicator parameters
+    SetIndexStyle(0, DRAW_LINE);
+    SetIndexLabel(0, 'Trend Catcher Strategy Line');
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+    // Calculate the Trend Catcher Strategy Line
+    for(int i = prev_calculated; i < rates_total; i++)
+    {
+        double trendCatcherValue = iMA(NULL, 0, period, 0, MODE_SMA, PRICE_CLOSE, i) + (iATR(NULL, 0, period, i) * multiplier);
+
+        TrendCatcherStrategyLineBuffer()[i] = trendCatcherValue;
+    }
+
+    return(rates_total);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator buffers                                          |
+//+------------------------------------------------------------------+
+double[] TrendCatcherStrategyLineBuffer()
+{
+    static double buffer[];
+
+    return(buffer);
+}
